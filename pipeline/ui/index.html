@@ -1,0 +1,1335 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Support Desk</title>
+<style>
+:root {
+  --bg: #f6f7f9; --surface: #ffffff; --surface-2: #f9fafb; --hover: #f3f4f6;
+  --border: #e5e7eb; --border-strong: #d1d5db;
+  --text: #111827; --text-2: #374151; --muted: #6b7280; --faint: #9ca3af;
+  --accent: #4f46e5; --accent-hover: #4338ca; --accent-soft: #eef2ff; --accent-text: #4338ca;
+  --ok: #047857; --ok-soft: #ecfdf5;
+  --info: #1d4ed8; --info-soft: #eff6ff;
+  --warn: #b45309; --warn-soft: #fffbeb;
+  --bad: #b91c1c; --bad-soft: #fef2f2;
+  --gray: #4b5563; --gray-soft: #f3f4f6;
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, .05);
+  --shadow-lg: 0 20px 40px rgba(16, 24, 40, .16);
+  --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --bg: #111827; --surface: #1f2937; --surface-2: #1a2230; --hover: #273244;
+  --border: #334155; --border-strong: #475569;
+  --text: #f3f4f6; --text-2: #d1d5db; --muted: #9ca3af; --faint: #6b7280;
+  --accent: #818cf8; --accent-hover: #a5b4fc; --accent-soft: #2e3366; --accent-text: #c7d2fe;
+  --ok: #34d399; --ok-soft: #12352c;
+  --info: #60a5fa; --info-soft: #172c4d;
+  --warn: #fbbf24; --warn-soft: #3a2e12;
+  --bad: #f87171; --bad-soft: #3d1d1d;
+  --gray: #d1d5db; --gray-soft: #2b3545;
+  --shadow-sm: none; --shadow-lg: 0 20px 40px rgba(0, 0, 0, .5);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--text); font: 14px/1.5 var(--font); -webkit-font-smoothing: antialiased; }
+h1, h2, h3, h4 { margin: 0; color: var(--text); }
+p { margin: 0; }
+a { color: var(--accent-text); cursor: pointer; text-decoration: none; }
+a:hover { text-decoration: underline; }
+[hidden] { display: none !important; }
+svg.i { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.muted { color: var(--muted); }
+.mono { font-family: var(--mono); font-size: 12.5px; }
+
+/* ---------- buttons and form controls ---------- */
+button { font: inherit; font-size: 13.5px; font-weight: 500; color: var(--text-2); background: var(--surface); border: 1px solid var(--border-strong);
+  border-radius: 8px; padding: 7px 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: var(--shadow-sm); }
+button:hover { background: var(--hover); }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible, .kpi:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+:root[data-theme="dark"] button.primary { color: #111827; }
+button.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+button.danger { color: var(--bad); }
+button.danger.on { background: var(--bad); border-color: var(--bad); color: #fff; }
+button.ghost { border-color: transparent; box-shadow: none; background: transparent; }
+button.ghost:hover { background: var(--hover); }
+button.sm { padding: 4px 10px; font-size: 12.5px; }
+button:disabled { opacity: .5; cursor: not-allowed; }
+.icon-btn { padding: 7px; border-color: transparent; background: transparent; box-shadow: none; color: var(--muted); }
+.icon-btn:hover { color: var(--text); }
+input, select, textarea { font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--border-strong); border-radius: 8px; padding: 8px 11px; width: 100%; }
+input::placeholder, textarea::placeholder { color: var(--faint); }
+textarea { min-height: 120px; resize: vertical; }
+select { width: auto; padding-right: 28px; }
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.field > label, .label { font-size: 13px; font-weight: 500; color: var(--text-2); }
+.help { font-size: 12.5px; color: var(--muted); }
+.flash { font-size: 13px; min-height: 20px; margin-top: 10px; color: var(--muted); }
+.flash.ok { color: var(--ok); } .flash.bad { color: var(--bad); }
+
+/* ---------- sign-in ---------- */
+.login { min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; }
+.login-card { width: 100%; max-width: 420px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px; box-shadow: var(--shadow-sm); }
+.login-card h1 { font-size: 20px; margin: 22px 0 4px; }
+.login-card form { margin-top: 20px; }
+.login-card button[type=submit] { width: 100%; justify-content: center; padding: 9px; }
+.accts { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
+.acct { justify-content: space-between; text-align: left; width: 100%; padding: 10px 12px; box-shadow: none; border-color: var(--border); }
+.acct small { display: block; font-weight: 400; color: var(--muted); font-size: 12px; }
+
+/* ---------- app shell ---------- */
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand .logo { width: 32px; height: 32px; border-radius: 8px; background: var(--accent); color: #fff; display: grid; place-items: center; }
+:root[data-theme="dark"] .brand .logo { color: #111827; }
+.brand b { display: block; font-size: 15px; }
+.brand small { display: block; color: var(--muted); font-size: 12px; line-height: 1.3; }
+.app { display: grid; grid-template-columns: 240px minmax(0, 1fr); min-height: 100vh; }
+.sidebar { background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; padding: 18px 12px; }
+.sidebar .brand { padding: 0 8px 18px; }
+nav { flex: 1; overflow-y: auto; }
+.nav-group { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); padding: 14px 10px 6px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; color: var(--text-2); font-weight: 500; font-size: 13.5px; text-decoration: none; }
+.nav-item:hover { background: var(--hover); text-decoration: none; }
+.nav-item.active { background: var(--accent-soft); color: var(--accent-text); }
+.nav-item .count { margin-left: auto; font-size: 11.5px; font-weight: 600; padding: 0 7px; border-radius: 99px; background: var(--warn-soft); color: var(--warn); line-height: 20px; }
+.nav-item .count.bad { background: var(--bad-soft); color: var(--bad); }
+.side-foot { border-top: 1px solid var(--border); padding: 14px 10px 0; font-size: 12.5px; color: var(--muted); }
+.side-foot b { color: var(--text-2); font-weight: 600; display: block; margin-bottom: 2px; }
+
+.main { min-width: 0; display: flex; flex-direction: column; }
+.topbar { display: flex; align-items: center; gap: 16px; padding: 18px 28px; border-bottom: 1px solid var(--border); background: var(--surface); flex-wrap: wrap; }
+.topbar h1 { font-size: 19px; font-weight: 650; letter-spacing: -.01em; }
+.topbar p { color: var(--muted); font-size: 13px; margin-top: 2px; }
+.top-actions { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+.live { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--muted); margin-right: 8px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--faint); }
+.dot.on { background: #10b981; box-shadow: 0 0 0 3px color-mix(in srgb, #10b981 22%, transparent); }
+.dot.off { background: var(--bad); }
+.user { display: flex; align-items: center; gap: 10px; padding-left: 12px; margin-left: 4px; border-left: 1px solid var(--border); }
+.avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--accent-soft); color: var(--accent-text); display: grid; place-items: center; font-weight: 600; text-transform: uppercase; }
+.user .name { font-weight: 600; font-size: 13.5px; line-height: 1.2; }
+.user .role { font-size: 12px; color: var(--muted); }
+.content { padding: 24px 28px 48px; max-width: 1280px; width: 100%; }
+.view { display: flex; flex-direction: column; gap: 20px; }
+
+/* ---------- cards ---------- */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-sm); min-width: 0; }
+.card-h { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+.card-h h3 { font-size: 14.5px; font-weight: 600; }
+.card-h .right { margin-left: auto; font-size: 13px; }
+.card-b { padding: 18px; }
+.cols-2 { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 20px; align-items: start; }
+.cols-even { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+.narrow { max-width: 720px; display: flex; flex-direction: column; gap: 16px; }
+.banner { display: flex; gap: 10px; align-items: flex-start; padding: 12px 16px; border-radius: 10px; font-size: 13.5px; border: 1px solid; }
+.banner.info { background: var(--info-soft); color: var(--info); border-color: color-mix(in srgb, var(--info) 25%, transparent); }
+.banner.warn { background: var(--warn-soft); color: var(--warn); border-color: color-mix(in srgb, var(--warn) 30%, transparent); }
+.top-banner { margin: 16px 28px 0; }
+
+/* ---------- KPI cards ---------- */
+.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.kpis.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.kpis.five { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.kpi { all: unset; box-sizing: border-box; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+button.kpi { cursor: pointer; }
+button.kpi:hover { border-color: var(--border-strong); background: var(--surface-2); }
+.kpi .k { font-size: 13px; color: var(--muted); font-weight: 500; display: flex; align-items: center; gap: 8px; }
+.kpi .k .sw { width: 8px; height: 8px; border-radius: 50%; background: var(--faint); }
+.kpi .v { font-size: 28px; font-weight: 650; letter-spacing: -.02em; line-height: 1.2; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.kpi .v.sm { font-size: 18px; }
+.kpi .f { font-size: 12.5px; color: var(--muted); }
+.sw.ok { background: var(--ok) !important; } .sw.warn { background: var(--warn) !important; } .sw.bad { background: var(--bad) !important; } .sw.info { background: var(--info) !important; }
+
+/* ---------- tables and lists ---------- */
+.toolbar { display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+.toolbar input[type=search] { max-width: 280px; margin-left: auto; }
+.seg { display: inline-flex; background: var(--gray-soft); border-radius: 9px; padding: 3px; gap: 2px; flex-wrap: wrap; }
+.seg button { border: 0; background: transparent; box-shadow: none; padding: 5px 11px; font-size: 13px; color: var(--muted); border-radius: 7px; }
+.seg button.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 2px rgba(16, 24, 40, .1); }
+.seg button .n { font-size: 11.5px; color: var(--faint); font-variant-numeric: tabular-nums; }
+.tbl-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+th { text-align: left; font-weight: 500; color: var(--muted); font-size: 12.5px; padding: 10px 18px; background: var(--surface-2); border-bottom: 1px solid var(--border); white-space: nowrap; }
+td { padding: 11px 18px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr.click { cursor: pointer; }
+tbody tr.click:hover td { background: var(--surface-2); }
+tbody tr.sel td { background: var(--accent-soft); }
+td.text { max-width: 380px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+td.when { white-space: nowrap; color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+td.c, th.c { text-align: center; }
+.empty { padding: 40px 18px; text-align: center; color: var(--muted); font-size: 13.5px; }
+.list-item { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.list-item:last-child { border-bottom: 0; }
+.list-item .top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; }
+.list-item .top .right { margin-left: auto; }
+.list-item .body { color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.list-item .raw { font-family: var(--mono); font-size: 12px; color: var(--muted); background: var(--surface-2); border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.list-item.click { cursor: pointer; }
+.list-item.click:hover { background: var(--surface-2); }
+
+/* ---------- status badges ---------- */
+.badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; padding: 2px 9px; border-radius: 99px; white-space: nowrap; line-height: 20px; }
+.badge.dot::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.st-received, .st-classified { background: var(--info-soft); color: var(--info); }
+.st-needs_human_review { background: var(--warn-soft); color: var(--warn); }
+.st-responded { background: var(--ok-soft); color: var(--ok); }
+.st-dead { background: var(--bad-soft); color: var(--bad); }
+.b-gray { background: var(--gray-soft); color: var(--gray); }
+.b-accent { background: var(--accent-soft); color: var(--accent-text); }
+.b-warn { background: var(--warn-soft); color: var(--warn); }
+.b-bad { background: var(--bad-soft); color: var(--bad); }
+.b-ok { background: var(--ok-soft); color: var(--ok); }
+
+.conf { display: flex; align-items: center; gap: 8px; min-width: 110px; }
+.conf .bar { position: relative; flex: 1; height: 6px; border-radius: 99px; background: var(--gray-soft); max-width: 80px; }
+.conf .bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 99px; background: var(--ok); }
+.conf .bar i.low { background: var(--warn); }
+.conf .bar b { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--text-2); opacity: .45; }
+.conf span { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+
+/* ---------- overview ---------- */
+.steps { list-style: none; margin: 0; padding: 6px 18px 14px; }
+.steps li { display: grid; grid-template-columns: 32px 1fr auto; gap: 12px; align-items: center; padding: 11px 0; border-bottom: 1px dashed var(--border); }
+.steps li:last-child { border-bottom: 0; }
+.steps .num { width: 28px; height: 28px; border-radius: 50%; background: var(--gray-soft); color: var(--text-2); display: grid; place-items: center; font-size: 12.5px; font-weight: 600; }
+.steps .num.warn { background: var(--warn-soft); color: var(--warn); } .steps .num.bad { background: var(--bad-soft); color: var(--bad); } .steps .num.ok { background: var(--ok-soft); color: var(--ok); }
+.steps .t { font-weight: 500; }
+.steps .d { font-size: 12.5px; color: var(--muted); }
+.steps .val { font-size: 18px; font-weight: 650; font-variant-numeric: tabular-nums; }
+
+/* ---------- new request ---------- */
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-size: 12.5px; padding: 4px 11px; border-radius: 99px; border: 1px solid var(--border); background: var(--surface); color: var(--text-2); box-shadow: none; }
+.chip:hover { border-color: var(--accent); color: var(--accent-text); background: var(--accent-soft); }
+details.adv { margin-bottom: 16px; }
+details.adv summary { cursor: pointer; font-size: 13px; color: var(--muted); font-weight: 500; margin-bottom: 10px; }
+.form-actions { display: flex; gap: 10px; align-items: center; }
+.result { margin-top: 16px; padding: 14px 16px; border-radius: 10px; background: var(--ok-soft); color: var(--ok); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 13.5px; }
+.result.bad { background: var(--bad-soft); color: var(--bad); }
+.result button { margin-left: auto; }
+.how { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.how div { padding: 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+.how b { display: block; font-size: 13px; margin-bottom: 2px; }
+.how span { font-size: 12.5px; color: var(--muted); }
+
+/* ---------- review ---------- */
+.cols-review { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 20px; align-items: start; }
+.empty-state { text-align: center; padding: 36px 18px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.empty-state .ic { width: 44px; height: 44px; border-radius: 50%; background: var(--accent-soft); color: var(--accent-text); display: grid; place-items: center; }
+.empty-state h4 { font-size: 15px; }
+.empty-state p { color: var(--muted); max-width: 380px; font-size: 13.5px; }
+.ticket-text { padding: 14px 16px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; font-size: 14.5px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 12px 0 18px; font-size: 13px; color: var(--muted); }
+.lock { font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* ---------- pipeline diagram ---------- */
+.flow-scroll { overflow-x: auto; padding: 22px 18px 8px; }
+.flow { display: grid; grid-template-columns: repeat(5, minmax(118px, 1fr) 26px) minmax(118px, 1fr); row-gap: 6px; min-width: 960px; align-items: stretch; }
+.node { border: 1px solid var(--border); border-radius: 10px; padding: 12px; background: var(--surface); text-align: center; transition: box-shadow .3s, border-color .3s; }
+.node .k { font-size: 12px; color: var(--muted); font-weight: 500; }
+.node .n { font-size: 22px; font-weight: 650; font-variant-numeric: tabular-nums; margin: 2px 0; }
+.node .s { font-size: 11.5px; color: var(--muted); }
+.node.queue { background: var(--surface-2); border-style: dashed; border-color: var(--border-strong); }
+.node.worker { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 30%, transparent); }
+.node.worker .k { color: var(--accent-text); }
+.node.worker.down { background: var(--bad-soft); border-color: var(--bad); }
+.node.worker.down .k { color: var(--bad); }
+.node.dlq.has { background: var(--bad-soft); border-color: var(--bad); border-style: solid; }
+.node.review.has { background: var(--warn-soft); border-color: var(--warn); border-style: solid; }
+.node.pulse { box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent); border-color: var(--accent); }
+.arrow { display: grid; place-items: center; color: var(--faint); font-size: 16px; }
+.branch { text-align: center; font-size: 11.5px; color: var(--muted); }
+.branch b { display: block; font-size: 15px; color: var(--faint); font-weight: 400; line-height: 1.1; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 22px; padding: 12px 18px 16px; font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--border); }
+.legend b { color: var(--text-2); }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 9px 18px; font-size: 13.5px; margin: 0; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+
+/* ---------- simulate ---------- */
+.sim { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.sim .card-b { display: flex; flex-direction: column; gap: 10px; height: 100%; }
+.sim .ic { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent-text); }
+.sim .ic.warn { background: var(--warn-soft); color: var(--warn); } .sim .ic.bad { background: var(--bad-soft); color: var(--bad); }
+.sim h4 { font-size: 14.5px; }
+.sim p { color: var(--muted); font-size: 13px; flex: 1; }
+.sim button { align-self: flex-start; }
+
+/* ---------- users ---------- */
+.new-user { display: grid; grid-template-columns: 1.2fr 1.2fr 1fr auto; gap: 12px; align-items: end; }
+.new-user .field { margin: 0; }
+.new-user select { width: 100%; }
+td.acts { text-align: right; white-space: nowrap; }
+.matrix td.yes { color: var(--ok); font-weight: 600; }
+.matrix td.no { color: var(--faint); }
+
+/* ---------- ticket drawer ---------- */
+.drawer-bg { position: fixed; inset: 0; background: rgba(17, 24, 39, .35); z-index: 40; }
+.drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(520px, 100vw); background: var(--surface); border-left: 1px solid var(--border); box-shadow: var(--shadow-lg);
+  z-index: 50; display: flex; flex-direction: column; transform: translateX(100%); transition: transform .2s ease; }
+.drawer.open { transform: none; }
+.drawer > header { display: flex; align-items: flex-start; gap: 10px; padding: 18px 20px; border-bottom: 1px solid var(--border); }
+.drawer > header h2 { font-size: 16px; }
+.drawer > header .icon-btn { margin-left: auto; }
+.drawer-body { padding: 20px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 20px; }
+.section-t { font-size: 12px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+.timeline { list-style: none; margin: 0; padding: 0; }
+.timeline li { position: relative; padding: 0 0 16px 28px; }
+.timeline li::before { content: ""; position: absolute; left: 6px; top: 6px; width: 10px; height: 10px; border-radius: 50%; background: var(--surface); border: 2px solid var(--ok); }
+.timeline li::after { content: ""; position: absolute; left: 11px; top: 20px; bottom: 0; width: 2px; background: var(--border); }
+.timeline li:last-child { padding-bottom: 0; }
+.timeline li:last-child::after { display: none; }
+.timeline li.done::before { background: var(--ok); }
+.timeline li.warn::before { border-color: var(--warn); background: var(--warn); }
+.timeline li.wait::before { border-color: var(--faint); }
+.timeline li.bad::before { border-color: var(--bad); background: var(--bad); }
+.timeline .t { font-weight: 500; }
+.timeline .d { font-size: 12.5px; color: var(--muted); }
+.reply { padding: 14px 16px; border-radius: 10px; background: var(--ok-soft); color: var(--text); white-space: pre-wrap; overflow-wrap: anywhere; border: 1px solid color-mix(in srgb, var(--ok) 20%, transparent); }
+.drawer .kv dd { text-align: left; }
+
+/* ---------- responsive ---------- */
+@media (max-width: 1100px) {
+  .kpis, .kpis.five { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cols-2, .cols-review, .cols-even { grid-template-columns: minmax(0, 1fr); }
+  .sim { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 860px) {
+  .app { display: block; }
+  .sidebar { position: sticky; top: 0; z-index: 30; height: auto; flex-direction: row; align-items: center; gap: 8px; padding: 10px 16px; border-right: 0; border-bottom: 1px solid var(--border); }
+  .sidebar .brand { padding: 0; }
+  .sidebar .brand div { display: none; }
+  nav { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  .nav-group, .side-foot { display: none; }
+  .nav-item { white-space: nowrap; padding: 7px 10px; }
+  .topbar { padding: 14px 16px; }
+  .top-banner { margin: 12px 16px 0; }
+  .content { padding: 16px 16px 40px; }
+  .live span:last-child, .user .meta-txt { display: none; }
+  .toolbar input[type=search] { max-width: none; margin-left: 0; }
+  .new-user, .how { grid-template-columns: minmax(0, 1fr); }
+  .kpis.three { grid-template-columns: minmax(0, 1fr); }
+  th, td { padding-left: 12px; padding-right: 12px; }
+}
+@media (max-width: 480px) {
+  .kpis, .kpis.five { grid-template-columns: minmax(0, 1fr); }
+  .user { border-left: 0; padding-left: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============ sign-in ============ -->
+<div class="login" id="login" hidden>
+  <div class="login-card">
+    <div class="brand"><span class="logo" data-icon="inbox"></span><div><b>Support Desk</b><small>Support-ticket pipeline</small></div></div>
+    <h1>Sign in</h1>
+    <p class="muted">Use your account to continue.</p>
+    <form id="login-form" autocomplete="on">
+      <div class="field"><label for="l-user">Username</label><input id="l-user" required autocomplete="username"></div>
+      <div class="field"><label for="l-pass">Password</label><input id="l-pass" type="password" required autocomplete="current-password"></div>
+      <button class="primary" type="submit">Sign in</button>
+      <div class="flash" id="login-flash"></div>
+    </form>
+    <div id="demo-accts"></div>
+  </div>
+</div>
+
+<!-- ============ app ============ -->
+<div class="app" id="app" hidden>
+  <aside class="sidebar">
+    <div class="brand"><span class="logo" data-icon="inbox"></span><div><b>Support Desk</b><small>Support-ticket pipeline</small></div></div>
+    <nav id="nav" aria-label="Sections"></nav>
+    <div class="side-foot" id="side-foot"></div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div><h1 id="page-title">Overview</h1><p id="page-sub"></p></div>
+      <div class="top-actions">
+        <span class="live"><span class="dot" id="live-dot"></span><span id="live-text">connecting…</span></span>
+        <button class="icon-btn" id="btn-theme" type="button" title="Switch light / dark" aria-label="Switch light or dark theme"></button>
+        <div class="user" id="who">
+          <span class="avatar" id="who-initial"></span>
+          <div class="meta-txt"><div class="name" id="who-name"></div><div class="role" id="who-role"></div></div>
+          <button class="ghost sm" id="btn-logout" type="button">Sign out</button>
+        </div>
+      </div>
+    </header>
+    <div class="banner warn top-banner" id="outage-banner" hidden>
+      <span data-icon="alert"></span>
+      <div><b>Model outage simulation is on.</b> New tickets will retry and then land in Failures. Turn it off under <a data-go="simulate">Simulate failures</a>.</div>
+    </div>
+
+    <main class="content">
+
+      <!-- Overview -->
+      <section class="view" id="view-overview" hidden>
+        <div class="kpis">
+          <button class="kpi" data-go="tickets" data-filter=""><span class="k"><span class="sw info"></span>Tickets received</span><span class="v" id="k-total">0</span><span class="f" id="k-total-f">all time</span></button>
+          <button class="kpi" data-go="tickets" data-filter="responded"><span class="k"><span class="sw ok"></span>Answered</span><span class="v" id="k-answered">0</span><span class="f" id="k-answered-f">-</span></button>
+          <button class="kpi" data-go="review"><span class="k"><span class="sw warn"></span>Waiting for a person</span><span class="v" id="k-review">0</span><span class="f">the model was not sure</span></button>
+          <button class="kpi" data-go="failures"><span class="k"><span class="sw bad"></span>Failed</span><span class="v" id="k-failed">0</span><span class="f">in dead-letter queues</span></button>
+        </div>
+        <div class="cols-2">
+          <div class="card">
+            <div class="card-h"><h3>Recent tickets</h3><a class="right" data-go="tickets">View all</a></div>
+            <div id="ov-recent"></div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h3>How tickets flow</h3><a class="right" data-go="pipeline">Live pipeline</a></div>
+            <ol class="steps" id="ov-steps"></ol>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tickets / My requests -->
+      <section class="view" id="view-tickets" hidden>
+        <div class="kpis three" id="my-kpis" hidden>
+          <div class="kpi"><span class="k"><span class="sw info"></span>In progress</span><span class="v" id="m-progress">0</span><span class="f">being classified or answered</span></div>
+          <div class="kpi"><span class="k"><span class="sw warn"></span>With a support agent</span><span class="v" id="m-agent">0</span><span class="f">a person will reply</span></div>
+          <div class="kpi"><span class="k"><span class="sw ok"></span>Answered</span><span class="v" id="m-answered">0</span><span class="f">reply ready to read</span></div>
+        </div>
+        <div class="card">
+          <div class="toolbar">
+            <div class="seg" id="filters" role="tablist" aria-label="Filter by status"></div>
+            <input type="search" id="search" placeholder="Search message or customer" aria-label="Search tickets">
+            <button class="primary" type="button" data-go="new" id="btn-new">New request</button>
+          </div>
+          <div class="tbl-wrap"><table><thead id="thead"></thead><tbody id="rows"></tbody></table></div>
+        </div>
+      </section>
+
+      <!-- New request -->
+      <section class="view" id="view-new" hidden>
+        <div class="narrow">
+          <div class="card">
+            <div class="card-h"><h3>Describe the problem</h3></div>
+            <form class="card-b" id="send-form" autocomplete="off">
+              <div class="field"><span class="label">Start from an example</span><div class="chips" id="examples"></div></div>
+              <div class="field"><label for="f-text">Message</label><textarea id="f-text" required maxlength="5000" placeholder="What went wrong? Include anything that helps us answer."></textarea></div>
+              <div class="field" id="cust-field"><label for="f-cust">Customer ID</label><input id="f-cust" value="cust-1" required maxlength="128"><span class="help">Who the ticket is for.</span></div>
+              <details class="adv">
+                <summary>Advanced</summary>
+                <div class="field"><label for="f-key">Idempotency key <span class="muted">(optional)</span></label><input id="f-key" maxlength="128" placeholder="e.g. order-77"><span class="help">Sending the same key twice returns the first ticket instead of creating a new one.</span></div>
+              </details>
+              <div class="form-actions"><button class="primary" type="submit">Submit request</button></div>
+              <div id="send-result"></div>
+            </form>
+          </div>
+          <div class="how">
+            <div><b>1. Classified</b><span>A model reads the message and decides what it is about.</span></div>
+            <div><b>2. Answered</b><span>Confident tickets get a reply in a few seconds.</span></div>
+            <div><b>3. Or a person helps</b><span>If the model is unsure, a support agent replies instead.</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Human review -->
+      <section class="view" id="view-review" hidden>
+        <div class="banner info" id="review-readonly" hidden><span data-icon="eye"></span><div>You can see this queue, but your role cannot answer tickets.</div></div>
+        <div class="kpis three">
+          <div class="kpi"><span class="k"><span class="sw warn"></span>Waiting</span><span class="v" id="r-waiting">0</span><span class="f">not yet picked up</span></div>
+          <div class="kpi"><span class="k"><span class="sw info"></span>Being reviewed</span><span class="v" id="r-flight">0</span><span class="f">locked to a reviewer</span></div>
+          <div class="kpi"><span class="k"><span class="sw ok"></span>Answered by people</span><span class="v" id="r-done">0</span><span class="f" id="r-done-f">all time</span></div>
+        </div>
+        <div class="cols-review">
+          <div class="card" id="review-work">
+            <div class="card-h"><h3>Workspace</h3><span class="right lock" id="r-lock"></span></div>
+            <div id="review-body"></div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h3>Queue</h3><span class="right muted" id="review-q-hint">oldest first</span></div>
+            <div id="review-list"></div>
+          </div>
+        </div>
+        <div class="card" id="corr-card">
+          <div class="card-h"><h3>Recent decisions</h3><span class="right muted">the model's guess next to the reviewer's label, kept for retraining</span></div>
+          <div class="tbl-wrap"><table><thead><tr><th>Message</th><th>Model guessed</th><th>Reviewer chose</th><th>Confidence</th><th>Reviewer</th></tr></thead><tbody id="corr-rows"></tbody></table></div>
+        </div>
+      </section>
+
+      <!-- Failures -->
+      <section class="view" id="view-failures" hidden>
+        <div class="kpis three">
+          <div class="kpi"><span class="k"><span class="sw bad"></span>Incoming DLQ</span><span class="v" id="f-in">0</span><span class="f">failed before or during classification</span></div>
+          <div class="kpi"><span class="k"><span class="sw bad"></span>Classified DLQ</span><span class="v" id="f-cl">0</span><span class="f">failed while writing the reply</span></div>
+          <div class="kpi"><span class="k"><span class="sw"></span>Retry limit</span><span class="v" id="f-max">3</span><span class="f" id="f-max-f">attempts before a message is moved here</span></div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h3>Failed messages</h3><span class="right muted">A dead-letter queue (DLQ) holds messages that can never succeed, or that failed too many times.</span></div>
+          <div id="dlq-list"></div>
+        </div>
+      </section>
+
+      <!-- Pipeline -->
+      <section class="view" id="view-pipeline" hidden>
+        <div class="card">
+          <div class="card-h"><h3>Live flow</h3><span class="right muted">queue number = messages waiting · in flight = being worked on</span></div>
+          <div class="flow-scroll">
+            <div class="flow">
+              <div class="node" id="n-api" style="grid-row:1;grid-column:1"><div class="k">Ingest API</div><div class="n" id="v-api">0</div><div class="s">accepted</div></div>
+              <div class="arrow" style="grid-row:1;grid-column:2">→</div>
+              <div class="node queue" id="n-incoming" style="grid-row:1;grid-column:3"><div class="k">incoming queue</div><div class="n" id="v-incoming">0</div><div class="s" id="s-incoming">0 in flight</div></div>
+              <div class="arrow" style="grid-row:1;grid-column:4">→</div>
+              <div class="node worker" id="n-classifier" style="grid-row:1;grid-column:5"><div class="k">Classifier</div><div class="n" id="v-classifier">0</div><div class="s" id="s-classifier">processed</div></div>
+              <div class="arrow" style="grid-row:1;grid-column:6">→</div>
+              <div class="node queue" id="n-classified" style="grid-row:1;grid-column:7"><div class="k">classified queue</div><div class="n" id="v-classified">0</div><div class="s" id="s-classified">0 in flight</div></div>
+              <div class="arrow" style="grid-row:1;grid-column:8">→</div>
+              <div class="node worker" id="n-responder" style="grid-row:1;grid-column:9"><div class="k">Responder</div><div class="n" id="v-responder">0</div><div class="s" id="s-responder">processed</div></div>
+              <div class="arrow" style="grid-row:1;grid-column:10">→</div>
+              <div class="node" id="n-store" style="grid-row:1;grid-column:11"><div class="k">Answered</div><div class="n" id="v-store">0</div><div class="s">reply saved</div></div>
+              <div class="branch" style="grid-row:2;grid-column:3"><b>↓</b>bad or out of retries</div>
+              <div class="branch" style="grid-row:2;grid-column:5"><b>↓</b>low confidence</div>
+              <div class="branch" style="grid-row:2;grid-column:7"><b>↓</b>bad or out of retries</div>
+              <div class="node queue dlq" id="n-incoming-dlq" style="grid-row:3;grid-column:3"><div class="k">incoming DLQ</div><div class="n" id="v-incoming-dlq">0</div><div class="s">failed</div></div>
+              <div class="node queue review" id="n-review" style="grid-row:3;grid-column:5"><div class="k">human review</div><div class="n" id="v-review">0</div><div class="s">waiting for a person</div></div>
+              <div class="node queue dlq" id="n-classified-dlq" style="grid-row:3;grid-column:7"><div class="k">classified DLQ</div><div class="n" id="v-classified-dlq">0</div><div class="s">failed</div></div>
+            </div>
+          </div>
+          <div class="legend">
+            <span>Confidence threshold <b id="cfg-thr">0.6</b></span>
+            <span>Retry limit <b id="cfg-max">3</b> attempts</span>
+            <span>Retry backoff <b id="cfg-backoff">2</b>s × 2<sup>attempt−1</sup></span>
+            <span>Review lock <b id="cfg-lock">300</b>s</span>
+          </div>
+        </div>
+        <div class="cols-even">
+          <div class="card">
+            <div class="card-h"><h3>Worker activity</h3></div>
+            <div class="tbl-wrap"><table><thead><tr><th>Worker</th><th class="c">Processed</th><th class="c">Retried</th><th class="c">Malformed</th><th class="c">To human</th></tr></thead><tbody id="workers"></tbody></table></div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h3>All counters</h3><span class="right muted">since the server started</span></div>
+            <div class="card-b"><dl class="kv" id="counters"></dl></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Model -->
+      <section class="view" id="view-model" hidden>
+        <div id="model"></div>
+      </section>
+
+      <!-- Simulate -->
+      <section class="view" id="view-simulate" hidden>
+        <div class="sim">
+          <div class="card"><div class="card-b">
+            <span class="ic" data-icon="send"></span><h4>Unseen tickets</h4>
+            <p>Sends 10 tickets worded in ways the model never trained on. Some will be unsure and go to human review.</p>
+            <button id="btn-burst" type="button">Send 10 tickets</button>
+          </div></div>
+          <div class="card"><div class="card-b">
+            <span class="ic warn" data-icon="alert"></span><h4>Malformed messages</h4>
+            <p>Puts bad JSON and an unknown schema version on the queue. They can never succeed, so they go straight to Failures without retrying.</p>
+            <button id="btn-poison" type="button">Inject 2 messages</button>
+          </div></div>
+          <div class="card"><div class="card-b">
+            <span class="ic bad" data-icon="zap"></span><h4>Model outage</h4>
+            <p>The classifier fails on every message. Tickets retry with growing delays, then land in Failures after the retry limit.</p>
+            <button id="btn-outage" class="danger" type="button">Start outage</button>
+          </div></div>
+        </div>
+        <div class="flash" id="demo-flash"></div>
+      </section>
+
+      <!-- Users -->
+      <section class="view" id="view-users" hidden>
+        <div class="card">
+          <div class="card-h"><h3>Add a user</h3></div>
+          <div class="card-b">
+            <form class="new-user" id="new-user" autocomplete="off">
+              <div class="field"><label for="u-name">Username</label><input id="u-name" required maxlength="32" placeholder="e.g. priya"></div>
+              <div class="field"><label for="u-pass">Password <span class="muted">(8+ characters)</span></label><input id="u-pass" type="password" required minlength="8" autocomplete="new-password"></div>
+              <div class="field"><label for="u-role">Role</label><select id="u-role"></select></div>
+              <button class="primary" type="submit">Add user</button>
+            </form>
+            <div class="flash" id="u-flash"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h3>Users</h3><span class="right muted" id="u-count"></span></div>
+          <div class="tbl-wrap"><table><thead><tr><th>User</th><th>Role</th><th>Status</th><th>Added</th><th></th></tr></thead><tbody id="users"></tbody></table></div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h3>What each role can do</h3></div>
+          <div class="tbl-wrap"><table class="matrix" id="matrix"></table></div>
+        </div>
+      </section>
+
+      <!-- Audit -->
+      <section class="view" id="view-audit" hidden>
+        <div class="card">
+          <div class="card-h"><h3>Activity</h3><span class="right muted">latest 100 events</span></div>
+          <div class="tbl-wrap"><table><thead><tr><th>When</th><th>Who</th><th>Action</th><th>Target</th><th>Details</th></tr></thead><tbody id="audit"></tbody></table></div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- ============ ticket drawer ============ -->
+<div class="drawer-bg" id="drawer-bg" hidden></div>
+<aside class="drawer" id="drawer" aria-hidden="true" aria-labelledby="drawer-title" role="dialog">
+  <header>
+    <div><h2 id="drawer-title">Ticket</h2><div class="mono muted" id="drawer-id"></div></div>
+    <button class="icon-btn" id="drawer-close" type="button" aria-label="Close" data-icon="x"></button>
+  </header>
+  <div class="drawer-body" id="drawer-body"></div>
+</aside>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const nice = (i) => esc(String(i || "").replace(/_/g, " "));
+  // Only touch the DOM when the markup changed: no flicker, and clicks are not lost mid-refresh.
+  const setHTML = (el, html) => { if (el && el.__html !== html) { el.innerHTML = html; el.__html = html; } };
+  const setText = (id, v) => { const el = $(id); if (el && el.textContent !== String(v)) el.textContent = v; };
+
+  // ---------- icons ----------
+  const ICONS = {
+    grid: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+    inbox: '<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',
+    plus: '<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>',
+    check: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/>',
+    alert: '<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/>',
+    activity: '<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
+    cpu: '<rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/>',
+    zap: '<path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/>',
+    users: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+    file: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>',
+    send: '<path d="m22 2-7 20-4-9-9-4 20-7z"/><path d="M22 2 11 13"/>',
+    eye: '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
+    x: '<path d="M18 6 6 18M6 6l12 12"/>',
+    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',
+    moon: '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
+  };
+  const icon = (n) => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n] || ""}</svg>`;
+  for (const el of document.querySelectorAll("[data-icon]")) el.innerHTML = icon(el.dataset.icon);
+
+  // ---------- local preferences ----------
+  const store = {
+    get: (k) => { try { return localStorage.getItem(k); } catch { return null; } },
+    set: (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {} },
+  };
+  function applyTheme(t) {
+    document.documentElement.dataset.theme = t;
+    $("btn-theme").innerHTML = icon(t === "dark" ? "sun" : "moon");
+  }
+  applyTheme(store.get("theme") === "dark" ? "dark" : "light");
+  $("btn-theme").onclick = () => {
+    const t = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    store.set("theme", t); applyTheme(t);
+  };
+
+  // ---------- session ----------
+  let token = store.get("token");
+  let me = null;
+  let authCfg = { auth_enabled: true, demo_accounts: [], roles: [] };
+  let timer = null;
+  const can = (p) => !!me && me.permissions.includes(p);
+  const staff = () => can("dashboard.view");
+  const roleLabel = (r) => (authCfg.roles.find((x) => x.role === r) || {}).label || r;
+
+  const api = async (path, opts = {}) => {
+    const headers = { "content-type": "application/json" };
+    if (token) headers.authorization = "Bearer " + token;
+    const r = await fetch(path, { ...opts, headers });
+    if (r.status === 401 && !path.startsWith("/auth/login")) {
+      token = null; store.set("token", null);
+      showLogin("Your session ended. Please sign in again.");
+      throw new Error("sign in required");
+    }
+    if (!r.ok) {
+      let msg = "";
+      try { const j = await r.json(); msg = typeof j.detail === "string" ? j.detail : (j.detail || []).map((d) => d.msg).join("; "); } catch {}
+      throw new Error(msg || `HTTP ${r.status}`);
+    }
+    return r.json();
+  };
+
+  const ROLE_NOTES = {
+    viewer: "Read-only access to the dashboard and every ticket.",
+    requester: "You can raise tickets and follow your own.",
+    reviewer: "You answer tickets the model was unsure about.",
+    admin: "Full access, including users and failure controls.",
+  };
+  const PERM_TEXT = {
+    "dashboard.view": "See the dashboard, all tickets, queues and model",
+    "messages.create": "Raise tickets",
+    "messages.own": "Follow their own tickets and replies",
+    "review.work": "Answer tickets in human review",
+    "demo.control": "Simulate failures (local mode)",
+    "users.manage": "Manage users and read the audit log",
+  };
+
+  function showLogin(msg) {
+    if (timer) { clearInterval(timer); timer = null; }
+    $("app").hidden = true; $("login").hidden = false; closeDrawer();
+    $("login-flash").className = "flash" + (msg ? " bad" : "");
+    $("login-flash").textContent = msg || "";
+    const a = authCfg.demo_accounts || [];
+    $("demo-accts").innerHTML = a.length ? `<div class="accts">
+      <div class="help">Demo accounts. Pick one to see the app the way that role does.</div>
+      ${a.map((x, i) => `<button type="button" class="acct" data-i="${i}"><span><b>${esc(x.username)}</b><small>${esc(x.about)}</small></span><span class="badge b-accent">${esc(roleLabel(x.role))}</span></button>`).join("")}
+    </div>` : "";
+    setTimeout(() => $("l-user").focus(), 0);
+  }
+  async function doLogin(username, password) {
+    try {
+      const r = await api("/auth/login", { method: "POST", body: JSON.stringify({ username, password }) });
+      const hadSession = !!me;
+      token = r.token; store.set("token", token);
+      if (hadSession) { location.hash = ""; location.reload(); return; } // different user: start clean
+      me = r.user; start();
+    } catch (err) { $("login-flash").className = "flash bad"; $("login-flash").textContent = err.message; }
+  }
+  $("login-form").addEventListener("submit", (e) => { e.preventDefault(); doLogin($("l-user").value.trim(), $("l-pass").value); });
+  $("demo-accts").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-i]"); if (!b) return;
+    const a = authCfg.demo_accounts[+b.dataset.i]; doLogin(a.username, a.password);
+  });
+  $("btn-logout").addEventListener("click", async () => {
+    await api("/auth/logout", { method: "POST" }).catch(() => {});
+    token = null; store.set("token", null); location.hash = ""; location.reload();
+  });
+
+  // ---------- views and navigation ----------
+  const VIEWS = {
+    overview: { group: "Workspace", icon: "grid", title: "Overview", sub: "What is happening across support right now.", allow: () => staff() },
+    tickets: { group: "Workspace", icon: "inbox", title: () => staff() ? "Tickets" : "My requests",
+      sub: () => staff() ? "Every ticket received. Click one to see what happened to it." : "Requests you have raised and the replies you got.",
+      allow: () => staff() || can("messages.own") },
+    new: { group: "Workspace", icon: "plus", title: "New request", sub: "Raise a support ticket. Most get an answer in a few seconds.", allow: () => can("messages.create") },
+    review: { group: "Workspace", icon: "check", title: "Human review", sub: "Tickets the model was not sure about. A person answers these.",
+      allow: () => can("review.work") || staff(), badge: () => reviewDepth().visible },
+    failures: { group: "Operations", icon: "alert", title: "Failures", sub: "Messages that could not be processed, and why.",
+      allow: () => staff(), badge: () => dlqCount(), badgeCls: "bad" },
+    pipeline: { group: "Operations", icon: "activity", title: "Pipeline", sub: "Live view of the queues and workers behind the tickets.", allow: () => staff() },
+    model: { group: "Operations", icon: "cpu", title: "Model", sub: "How well the intent classifier performs.", allow: () => staff() },
+    simulate: { group: "Operations", icon: "zap", title: "Simulate failures", sub: "Local mode only. Cause failures on purpose and watch the pipeline recover.",
+      allow: () => can("demo.control") && demoAvailable },
+    users: { group: "Admin", icon: "users", title: "Users & roles", sub: "Who can sign in, and what each role is allowed to do.", allow: () => can("users.manage") },
+    audit: { group: "Admin", icon: "file", title: "Audit log", sub: "Sign-ins, user changes, reviews and outages.", allow: () => can("users.manage") },
+  };
+  const val = (x) => typeof x === "function" ? x() : x;
+  let tab = null;
+
+  function defaultView() {
+    if (can("review.work") && !can("users.manage")) return "review";
+    if (staff()) return "overview";
+    return "tickets";
+  }
+  function renderNav() {
+    let html = "", group = "";
+    for (const [id, v] of Object.entries(VIEWS)) {
+      if (!v.allow()) continue;
+      if (v.group !== group) { group = v.group; html += `<div class="nav-group">${group}</div>`; }
+      const n = v.badge ? v.badge() : 0;
+      html += `<a class="nav-item${id === tab ? " active" : ""}" href="#${id}"${id === tab ? ' aria-current="page"' : ""}>${icon(v.icon)}<span>${esc(val(v.title))}</span>${n ? `<span class="count ${v.badgeCls || ""}">${n}</span>` : ""}</a>`;
+    }
+    setHTML($("nav"), html);
+  }
+  function go(name) {
+    if (!VIEWS[name] || !VIEWS[name].allow()) name = defaultView();
+    if (location.hash !== "#" + name) history.replaceState(null, "", "#" + name);
+    const changed = tab !== name;
+    tab = name;
+    for (const id of Object.keys(VIEWS)) $("view-" + id).hidden = id !== name;
+    setText("page-title", val(VIEWS[name].title));
+    setText("page-sub", val(VIEWS[name].sub));
+    renderNav();
+    if (changed) { needPeek = true; if (name === "model") loadModel(); if (name === "users" || name === "audit") loadAdmin(true); if (name === "review") loadCorrections(); }
+    renderView();
+  }
+  window.addEventListener("hashchange", () => me && go(location.hash.slice(1)));
+  document.addEventListener("click", (e) => {
+    const g = e.target.closest("[data-go]"); if (!g) return;
+    e.preventDefault();
+    if (g.dataset.filter !== undefined) { filter = g.dataset.filter; }
+    go(g.dataset.go);
+  });
+
+  function start() {
+    $("login").hidden = true; $("app").hidden = false;
+    $("btn-logout").hidden = !authCfg.auth_enabled;
+    $("who-initial").textContent = me.username[0] || "?";
+    $("who-name").textContent = me.username;
+    $("who-role").textContent = me.role_label;
+    $("side-foot").innerHTML = authCfg.auth_enabled
+      ? `<b>${esc(me.role_label)} access</b>${esc(ROLE_NOTES[me.role] || "")}`
+      : `<b>Access control off</b>AUTH_ENABLED=false, everyone has full access.`;
+    // requesters only see their own tickets, raised under their own name
+    $("cust-field").hidden = !staff();
+    if (!staff()) $("f-cust").value = me.username;
+    $("my-kpis").hidden = staff();
+    $("btn-new").hidden = !can("messages.create");
+    setupFilters();
+    if (can("users.manage")) setupAdmin();
+    go(location.hash.slice(1));
+    refresh();
+    timer = setInterval(refresh, 1500);
+  }
+
+  async function boot() {
+    try { authCfg = await api("/auth/config"); }
+    catch { showLogin("Cannot reach the API. Is the server running?"); return; }
+    if (authCfg.auth_enabled && !token) { showLogin(); return; }
+    try { me = await api("/auth/me"); } catch { return; } // a 401 already showed the sign-in screen
+    start();
+  }
+
+  // ---------- shared state ----------
+  let stats = null, myStats = { statuses: {} }, cfg = { confidence_threshold: 0.6, max_receive_count: 3, review_lock_seconds: 300, queue_names: {} };
+  let rows = [], filter = "", search = "", deadIds = new Set(), dlqItems = [], reviewItems = [], demoAvailable = false, outageOn = false;
+  let needPeek = true, prevNums = {};
+  const q = (k) => (stats && stats.queues[(cfg.queue_names || {})[k]]) || { visible: 0, in_flight: 0 };
+  const reviewDepth = () => q("human_review");
+  const dlqCount = () => { const a = q("incoming_dlq"), b = q("classified_dlq"); return a.visible + a.in_flight + b.visible + b.in_flight; };
+  const statusOf = (m) => (m.status === "received" && deadIds.has(m.message_id)) ? "dead" : m.status;
+
+  const STATUS = {
+    received: ["In progress", "Received"], classified: ["In progress", "Classified"], needs_human_review: ["With an agent", "Needs review"],
+    responded: ["Answered", "Answered"], dead: ["Failed", "Failed"],
+  };
+  const badge = (s) => `<span class="badge dot st-${esc(s)}">${esc((STATUS[s] || [s, s])[staff() ? 1 : 0])}</span>`;
+
+  const sameDay = (d) => d.toDateString() === new Date().toDateString();
+  const when = (iso) => {
+    if (!iso) return "";
+    const d = new Date(iso);
+    const t = d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" });
+    return sameDay(d) ? t : `${d.toLocaleDateString([], { month: "short", day: "numeric" })}, ${t}`;
+  };
+  const ago = (iso) => {
+    if (!iso) return "";
+    const s = Math.max(0, (Date.now() - new Date(iso)) / 1000);
+    if (s < 10) return "just now";
+    if (s < 60) return `${Math.floor(s)} s ago`;
+    if (s < 3600) return `${Math.floor(s / 60)} min ago`;
+    if (s < 86400) return `${Math.floor(s / 3600)} h ago`;
+    return when(iso);
+  };
+  const span = (a, b) => {
+    if (!a || !b) return "";
+    const d = new Date(b) - new Date(a);
+    return d < 1000 ? `${d} ms` : d < 60000 ? `${(d / 1000).toFixed(1)} s` : `${Math.round(d / 60000)} min`;
+  };
+  function confBar(c) {
+    if (c == null) return '<span class="muted">-</span>';
+    const thr = cfg.confidence_threshold;
+    return `<div class="conf" title="threshold ${thr}"><div class="bar"><i class="${c < thr ? "low" : ""}" style="width:${(c * 100).toFixed(0)}%"></i><b style="left:${thr * 100}%"></b></div><span>${c.toFixed(2)}</span></div>`;
+  }
+
+  // ---------- polling ----------
+  let tick = 0, busy = false;
+  async function refresh() {
+    if (busy || !me) return; busy = true;
+    try {
+      const [s, r] = await Promise.all([api(staff() ? "/stats" : "/my/stats"), api("/messages?limit=200")]);
+      rows = r;
+      if (staff()) {
+        stats = s; cfg = s.config || cfg;
+        const hadDemo = demoAvailable; demoAvailable = !!s.demo;
+        if (s.demo && s.demo.model_outage !== outageOn) setOutage(s.demo.model_outage);
+        if (hadDemo !== demoAvailable) go(tab);
+        await peeks();
+      } else myStats = s;
+      if (can("users.manage") && (tab === "users" || tab === "audit") && tick % 4 === 0) loadAdmin();
+      if (tab === "review" && can("review.work") && tick % 4 === 0) loadCorrections();
+      renderNav(); renderView();
+      if (drawerId) loadDetail();
+      $("live-dot").className = "dot on"; setText("live-text", "Live");
+    } catch {
+      $("live-dot").className = "dot off"; setText("live-text", "Offline");
+    } finally { busy = false; tick++; }
+  }
+  // Peeking a queue counts as a receive in SQS, so only peek when there is something to see.
+  async function peeks() {
+    if (!needPeek && tick % 3 !== 0) return;
+    needPeek = false;
+    const qn = cfg.queue_names;
+    const peek = (n) => api(`/queues/${encodeURIComponent(n)}/peek`).catch(() => []);
+    const jobs = [];
+    if (dlqCount() > 0) jobs.push(Promise.all([peek(qn.incoming_dlq), peek(qn.classified_dlq)]).then(([a, b]) => {
+      dlqItems = [...a.map((x) => ({ ...x, q: "incoming" })), ...b.map((x) => ({ ...x, q: "classified" }))];
+    })); else dlqItems = [];
+    if (tab === "review" && reviewDepth().visible > 0) jobs.push(peek(qn.human_review).then((x) => { reviewItems = x; }));
+    else if (reviewDepth().visible === 0) reviewItems = [];
+    await Promise.all(jobs);
+    deadIds = new Set(dlqItems.map((x) => x.body && x.body.message_id).filter(Boolean));
+  }
+
+  function renderView() {
+    ({ overview: renderOverview, tickets: renderTickets, review: renderReview, failures: renderFailures,
+       pipeline: renderPipeline, simulate: () => {}, model: () => {}, new: () => {}, users: () => {}, audit: () => {} }[tab] || (() => {}))();
+  }
+
+  // ---------- overview ----------
+  function renderOverview() {
+    if (!stats) return;
+    const st = stats.statuses || {}, c = stats.counters || {};
+    const total = Object.values(st).reduce((a, b) => a + b, 0);
+    const answered = st.responded || 0;
+    const byPeople = rows.filter((m) => m.generator === "human").length;
+    setText("k-total", total);
+    setText("k-total-f", total ? `${(st.received || 0) + (st.classified || 0)} still in progress` : "none yet");
+    setText("k-answered", answered);
+    setText("k-answered-f", total ? `${Math.round(answered / total * 100)}% of tickets${byPeople ? ` · ${byPeople} by people` : ""}` : "-");
+    setText("k-review", st.needs_human_review || 0);
+    setText("k-failed", dlqCount());
+
+    const recent = rows.slice(0, 7);
+    setHTML($("ov-recent"), recent.length ? recent.map((m) => `
+      <div class="list-item click" data-open="${esc(m.message_id)}">
+        <div class="top">${badge(statusOf(m))}<span class="muted">${esc(m.customer_id)}</span><span class="right muted">${ago(m.created_at)}</span></div>
+        <div class="body">${esc(m.text)}</div>
+      </div>`).join("") : `<div class="empty">No tickets yet.${can("messages.create") ? ' <a data-go="new">Raise the first one</a>.' : ""}</div>`);
+
+    const steps = [
+      ["", "Received by the API", "stored, then queued for the classifier", c["api.accepted"] || 0],
+      ["", "Classified by the model", `${c["classifier.routed_to_human"] || 0} were unsure and went to a person`, c["classifier.processed"] || 0],
+      ["ok", "Answered", "reply generated or written by a reviewer", answered],
+      ["warn", "Waiting for a person", "confidence below " + cfg.confidence_threshold, st.needs_human_review || 0],
+      ["bad", "Failed", `bad messages, or ${cfg.max_receive_count} failed attempts`, dlqCount()],
+    ];
+    setHTML($("ov-steps"), steps.map(([cls, t, d, v], i) => `<li><span class="num ${cls}">${i + 1}</span><div><div class="t">${t}</div><div class="d">${esc(d)}</div></div><span class="val">${v}</span></li>`).join(""));
+  }
+
+  // ---------- tickets ----------
+  const FILTERS_STAFF = [["", "All"], ["progress", "In progress"], ["needs_human_review", "Needs review"], ["responded", "Answered"], ["dead", "Failed"]];
+  const FILTERS_MINE = [["", "All"], ["progress", "In progress"], ["needs_human_review", "With an agent"], ["responded", "Answered"]];
+  const matches = (m, f) => !f || (f === "progress" ? ["received", "classified"].includes(statusOf(m)) : statusOf(m) === f);
+  let filterList = FILTERS_STAFF;
+  function setupFilters() {
+    filterList = staff() ? FILTERS_STAFF : FILTERS_MINE;
+    $("thead").innerHTML = staff()
+      ? "<tr><th>Received</th><th>Customer</th><th>Message</th><th>Intent</th><th>Confidence</th><th>Status</th></tr>"
+      : "<tr><th>Raised</th><th>Message</th><th>Status</th><th>Reply</th></tr>";
+  }
+  $("filters").addEventListener("click", (e) => { const b = e.target.closest("button[data-v]"); if (!b) return; filter = b.dataset.v; renderTickets(); });
+  $("search").addEventListener("input", (e) => { search = e.target.value.trim().toLowerCase(); renderTickets(); });
+
+  function renderTickets() {
+    if (!filterList.some(([v]) => v === filter)) filter = "";
+    setHTML($("filters"), filterList.map(([v, l]) => {
+      const n = rows.filter((m) => matches(m, v)).length;
+      return `<button type="button" role="tab" data-v="${v}" class="${v === filter ? "active" : ""}" aria-selected="${v === filter}">${l} <span class="n">${n}</span></button>`;
+    }).join(""));
+    if (!staff()) {
+      const st = myStats.statuses || {};
+      setText("m-progress", (st.received || 0) + (st.classified || 0));
+      setText("m-agent", st.needs_human_review || 0);
+      setText("m-answered", st.responded || 0);
+    }
+    const shown = rows.filter((m) => matches(m, filter) && (!search || (m.text || "").toLowerCase().includes(search) || (m.customer_id || "").toLowerCase().includes(search)));
+    const cols = staff() ? 6 : 4;
+    if (!shown.length) {
+      const none = rows.length ? "No tickets match." : staff() ? "No tickets yet." : "You have not raised any requests yet.";
+      setHTML($("rows"), `<tr><td colspan="${cols}" class="empty">${none}${!rows.length && can("messages.create") ? ' <a data-go="new">Raise one</a>.' : ""}</td></tr>`);
+      return;
+    }
+    setHTML($("rows"), shown.map((m) => staff() ? `
+      <tr class="click${m.message_id === drawerId ? " sel" : ""}" data-open="${esc(m.message_id)}">
+        <td class="when">${when(m.created_at)}</td>
+        <td>${esc(m.customer_id)}</td>
+        <td class="text" title="${esc(m.text)}">${esc(m.text)}</td>
+        <td>${m.intent ? nice(m.intent) : '<span class="muted">-</span>'}</td>
+        <td>${confBar(m.confidence)}</td>
+        <td>${badge(statusOf(m))}</td>
+      </tr>` : `
+      <tr class="click${m.message_id === drawerId ? " sel" : ""}" data-open="${esc(m.message_id)}">
+        <td class="when">${when(m.created_at)}</td>
+        <td class="text" title="${esc(m.text)}">${esc(m.text)}</td>
+        <td>${badge(m.status)}</td>
+        <td class="text" title="${esc(m.response || "")}">${m.response ? esc(m.response) : '<span class="muted">not yet</span>'}</td>
+      </tr>`).join(""));
+  }
+
+  // ---------- ticket drawer ----------
+  let drawerId = null;
+  document.addEventListener("click", (e) => {
+    const o = e.target.closest("[data-open]"); if (!o) return;
+    e.preventDefault(); openDrawer(o.dataset.open);
+  });
+  function openDrawer(id) {
+    drawerId = id;
+    $("drawer-bg").hidden = false; $("drawer").classList.add("open"); $("drawer").setAttribute("aria-hidden", "false");
+    $("drawer-body").__html = null; $("drawer-body").innerHTML = '<div class="muted">Loading…</div>';
+    $("drawer-id").textContent = id;
+    loadDetail(); renderView();
+    setTimeout(() => $("drawer-close").focus(), 0);
+  }
+  function closeDrawer() {
+    drawerId = null;
+    $("drawer-bg").hidden = true; $("drawer").classList.remove("open"); $("drawer").setAttribute("aria-hidden", "true");
+    if (me) renderView();
+  }
+  $("drawer-close").onclick = closeDrawer;
+  $("drawer-bg").onclick = closeDrawer;
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && drawerId) closeDrawer(); });
+
+  async function loadDetail() {
+    const id = drawerId; if (!id) return;
+    let m;
+    try { m = await api(`/messages/${encodeURIComponent(id)}`); }
+    catch { if (drawerId === id) setHTML($("drawer-body"), '<div class="empty">Ticket not found.</div>'); return; }
+    if (drawerId !== id) return;
+    setText("drawer-title", staff() ? "Ticket" : "Your request");
+    setHTML($("drawer-body"), staff() ? staffDetail(m) : myDetail(m));
+  }
+  const timeline = (steps) => `<ul class="timeline">${steps.map((s) => `<li class="${s.cls}"><div class="t">${s.t}</div><div class="d">${s.d}</div></li>`).join("")}</ul>`;
+
+  function staffDetail(m) {
+    const thr = cfg.confidence_threshold;
+    const st = statusOf(m);
+    const steps = [{ cls: "done", t: "Received", d: `${when(m.created_at)} · stored and put on the incoming queue` }];
+    if (m.classified_at) {
+      const low = m.route === "human_review";
+      steps.push({ cls: low ? "warn" : "done", t: `Classified as “${nice(m.model_intent || m.intent)}”`,
+        d: `${span(m.created_at, m.classified_at)} later · confidence ${m.confidence.toFixed(2)} ${low ? "is below" : "meets"} the ${thr} threshold → ${low ? "sent to human review" : "answered automatically"}` });
+      if (low && m.reviewed_at) {
+        const changed = m.model_intent && m.model_intent !== m.intent;
+        steps.push({ cls: "done", t: `Reviewed by ${esc(m.reviewed_by)}`,
+          d: `${span(m.classified_at, m.reviewed_at)} later · ${changed ? `intent corrected to “${nice(m.intent)}”` : "kept the model's intent"}` });
+      } else if (low) {
+        steps.push({ cls: "wait", t: "Waiting for a person", d: `No automatic reply, because the model was not sure. ${can("review.work") ? '<a data-go="review">Open Human review</a>' : "A reviewer will answer it."}` });
+      }
+    } else if (st === "dead") {
+      steps.push({ cls: "bad", t: "Failed", d: 'The classifier failed on every attempt, so the message moved to the incoming DLQ. <a data-go="failures">See Failures</a>' });
+    } else {
+      steps.push({ cls: "wait", t: "Waiting for the classifier", d: outageOn ? "The model is down, so this is retrying with backoff." : "On the incoming queue." });
+    }
+    if (m.responded_at) {
+      steps.push(m.generator === "human"
+        ? { cls: "done", t: "Reply sent by a person", d: when(m.responded_at) }
+        : { cls: "done", t: "Reply generated", d: `${span(m.classified_at, m.responded_at)} later · by ${esc(m.generator)}` });
+    } else if (m.classified_at && m.route === "auto") {
+      steps.push({ cls: "wait", t: "Writing the reply", d: "On the classified queue." });
+    }
+    return `
+      <div><div class="section-t">Message</div><div class="ticket-text">${esc(m.text)}</div></div>
+      ${m.response ? `<div><div class="section-t">Reply sent</div><div class="reply">${esc(m.response)}</div></div>` : ""}
+      <div><div class="section-t">What happened</div>${timeline(steps)}</div>
+      <div><div class="section-t">Details</div><dl class="kv">
+        <dt>Status</dt><dd>${badge(st)}</dd>
+        <dt>Customer</dt><dd>${esc(m.customer_id)}</dd>
+        ${m.created_by ? `<dt>Raised by</dt><dd>${esc(m.created_by)}</dd>` : ""}
+        <dt>Intent</dt><dd>${m.intent ? nice(m.intent) : "-"}</dd>
+        ${m.model_intent && m.model_intent !== m.intent ? `<dt>Model guessed</dt><dd>${nice(m.model_intent)}</dd>` : ""}
+        <dt>Confidence</dt><dd>${confBar(m.confidence)}</dd>
+        <dt>Total time</dt><dd>${m.responded_at ? span(m.created_at, m.responded_at) : "-"}</dd>
+        <dt>Model version</dt><dd class="mono">${esc(m.model_version || "-")}</dd>
+        <dt>Correlation id</dt><dd class="mono">${esc(m.correlation_id)}</dd>
+      </dl></div>
+      <p class="help">Every log line this ticket produced, in the API and both workers, carries the correlation id. Search the logs for it to follow this one request.</p>`;
+  }
+  function myDetail(m) {
+    const steps = [{ cls: "done", t: "Request received", d: when(m.created_at) }];
+    if (m.status === "responded") steps.push({ cls: "done", t: "Answered", d: `${when(m.responded_at)} · ${span(m.created_at, m.responded_at)} after you raised it` });
+    else if (m.status === "needs_human_review") steps.push({ cls: "wait", t: "With a support agent", d: "A person is looking at your request and will reply." });
+    else steps.push({ cls: "wait", t: "Being processed", d: "This usually takes a few seconds." });
+    return `
+      <div><div class="section-t">Your message</div><div class="ticket-text">${esc(m.text)}</div></div>
+      ${m.response ? `<div><div class="section-t">Reply</div><div class="reply">${esc(m.response)}</div></div>` : ""}
+      <div><div class="section-t">Progress</div>${timeline(steps)}</div>`;
+  }
+
+  // ---------- new request ----------
+  const EXAMPLES = [
+    ["Double charge", "I was charged twice for my Pro plan this month, please refund one"],
+    ["Cancel", "I want to cancel my subscription before the next renewal"],
+    ["Bug", "The dashboard keeps crashing on my laptop when I open reports"],
+    ["Account", "I can't log in, the password reset email never arrives"],
+    ["Vague", "hey, quick question about how things work"],
+  ];
+  $("examples").innerHTML = EXAMPLES.map(([l], i) => `<button type="button" class="chip" data-i="${i}">${esc(l)}</button>`).join("");
+  $("examples").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-i]"); if (!b) return;
+    $("f-text").value = EXAMPLES[b.dataset.i][1]; $("f-text").focus();
+  });
+  $("send-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const out = $("send-result");
+    const body = { customer_id: $("f-cust").value.trim(), text: $("f-text").value.trim() };
+    const key = $("f-key").value.trim(); if (key) body.idempotency_key = key;
+    try {
+      const r = await api("/messages", { method: "POST", body: JSON.stringify(body) });
+      out.innerHTML = `<div class="result"><span>${r.duplicate
+        ? "That idempotency key was used before, so the original request was returned. Nothing new was queued."
+        : "Request submitted. It usually gets an answer within a few seconds."}</span>
+        <button type="button" class="sm" data-open="${esc(r.message_id)}">View request</button></div>`;
+      if (!r.duplicate) $("f-text").value = "";
+      refresh();
+    } catch (err) { out.innerHTML = `<div class="result bad">${esc(err.message)}</div>`; }
+  });
+
+  // ---------- human review ----------
+  let claim = null, reviewFlash = { cls: "", text: "" }, corrections = [];
+  async function loadCorrections() {
+    if (!can("review.work")) return;
+    try { corrections = await api("/review/corrections"); } catch { return; }
+    if (tab === "review") renderCorrections();
+  }
+  function renderCorrections() {
+    const last = corrections.slice(-10).reverse();
+    setText("r-done", corrections.length);
+    setHTML($("corr-rows"), last.length ? last.map((c) => `
+      <tr class="click" data-open="${esc(c.message_id)}">
+        <td class="text" title="${esc(c.text)}">${esc(c.text)}</td>
+        <td>${nice(c.model_intent)}</td>
+        <td>${c.model_intent !== c.human_intent ? `<span class="badge b-warn">${nice(c.human_intent)}</span>` : `<span class="badge b-gray">${nice(c.human_intent)}</span>`}</td>
+        <td>${confBar(c.confidence)}</td>
+        <td>${esc(c.reviewed_by)}</td>
+      </tr>`).join("") : '<tr><td colspan="5" class="empty">No reviewed tickets yet.</td></tr>');
+  }
+  function renderReview() {
+    const work = can("review.work");
+    $("review-readonly").hidden = work;
+    $("review-work").hidden = !work;
+    $("corr-card").hidden = !work;
+    const d = reviewDepth();
+    setText("r-waiting", d.visible);
+    setText("r-flight", d.in_flight);
+    if (!work) setText("r-done", rows.filter((m) => m.generator === "human").length);
+    setText("r-done-f", work ? "all time" : "in the latest tickets");
+    setHTML($("review-list"), reviewItems.length ? reviewItems.map((x) => {
+      const b = x.body || {};
+      return `<div class="list-item${b.message_id ? " click" : ""}"${b.message_id ? ` data-open="${esc(b.message_id)}"` : ""}>
+        <div class="top"><span class="badge b-warn">guessed ${nice(b.intent || "?")}</span>${confBar(b.confidence)}</div>
+        <div class="body" title="${esc(b.text)}">${esc(b.text)}</div></div>`;
+    }).join("") : `<div class="empty">${d.visible ? "Loading…" : "Nothing waiting. Tickets the model is unsure about will show up here."}</div>`);
+    if (work && !claim) renderReviewIdle();
+    tickLock();
+  }
+  function renderReviewIdle() {
+    const n = reviewDepth().visible;
+    const mins = Math.round((cfg.review_lock_seconds || 300) / 60);
+    setHTML($("review-body"), `<div class="empty-state">
+      <span class="ic">${icon("check")}</span>
+      <h4>${n ? `${n} ticket${n === 1 ? "" : "s"} waiting` : "All caught up"}</h4>
+      <p>${n ? `Take the next ticket. It is locked to you for ${mins} minutes so no one else answers it at the same time.` : "There is nothing to review right now."}</p>
+      <button class="primary" type="button" id="r-claim"${n ? "" : " disabled"}>Review next ticket</button>
+      <div class="flash ${reviewFlash.cls}">${esc(reviewFlash.text)}</div>
+    </div>`);
+    setText("r-lock", "");
+  }
+  function renderReviewForm() {
+    const t = claim.ticket;
+    $("review-body").__html = null;
+    $("review-body").innerHTML = `<div class="card-b">
+      <div class="ticket-text">${esc(t.text)}</div>
+      <div class="meta"><span class="badge b-warn">model guessed ${nice(t.intent)}</span><span>confidence ${t.confidence.toFixed(2)}, below ${cfg.confidence_threshold}</span><span>· customer ${esc(t.customer_id)}</span>
+        <a data-open="${esc(t.message_id)}">full history</a></div>
+      <div class="field"><label for="r-intent">What is this ticket about?</label><select id="r-intent">${claim.intents.map((i) => `<option value="${esc(i)}"${i === t.intent ? " selected" : ""}>${nice(i)}</option>`).join("")}</select></div>
+      <div class="field"><label for="r-reply">Reply to the customer</label><textarea id="r-reply" maxlength="5000">${esc(claim.drafts[t.intent] || "")}</textarea><span class="help">Starts from the template for the chosen topic. Edit it freely.</span></div>
+      <div class="form-actions"><button class="primary" type="button" id="r-send">Send reply</button><button type="button" id="r-release">Put back in queue</button></div>
+      <div class="flash" id="r-flash2"></div>
+    </div>`;
+    tickLock();
+  }
+  function tickLock() {
+    if (!claim) return;
+    const s = Math.max(0, Math.round((claim.until - Date.now()) / 1000));
+    setText("r-lock", s ? `locked to you · ${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}` : "lock expired, another reviewer may take it");
+  }
+  setInterval(tickLock, 1000);
+  $("review-body").addEventListener("input", (e) => { if (e.target.id === "r-reply" && claim) claim.edited = true; });
+  $("review-body").addEventListener("change", (e) => {
+    if (e.target.id === "r-intent" && claim && !claim.edited) $("r-reply").value = claim.drafts[e.target.value] || "";
+  });
+  $("review-body").addEventListener("click", async (e) => {
+    const id = e.target.id;
+    if (id === "r-claim") {
+      const r = await api("/review/claim", { method: "POST" }).catch((err) => ({ error: err.message }));
+      if (r.error || !r.ticket) { reviewFlash = { cls: r.error ? "bad" : "", text: r.error || "Someone else took the last ticket." }; renderReviewIdle(); return; }
+      reviewFlash = { cls: "", text: "" };
+      claim = { ...r, until: Date.now() + r.lock_seconds * 1000, edited: false };
+      needPeek = true;
+      renderReviewForm();
+    } else if (id === "r-send" && claim) {
+      const body = { receipt_handle: claim.receipt_handle, intent: $("r-intent").value, response: $("r-reply").value.trim() };
+      if (!body.response) { $("r-flash2").className = "flash bad"; $("r-flash2").textContent = "Write a reply first."; return; }
+      try {
+        const r = await api(`/review/${encodeURIComponent(claim.ticket.message_id)}/complete`, { method: "POST", body: JSON.stringify(body) });
+        const fixed = body.intent !== claim.ticket.intent;
+        claim = null;
+        reviewFlash = { cls: "ok", text: r.saved ? `Reply sent.${fixed ? " The corrected topic is saved for retraining." : ""}` : "This ticket already had a reply, so nothing changed." };
+        renderReviewIdle(); loadCorrections(); needPeek = true; refresh();
+      } catch (err) { $("r-flash2").className = "flash bad"; $("r-flash2").textContent = err.message; }
+    } else if (id === "r-release" && claim) {
+      await api(`/review/${encodeURIComponent(claim.ticket.message_id)}/release`, { method: "POST", body: JSON.stringify({ receipt_handle: claim.receipt_handle }) }).catch(() => {});
+      claim = null; reviewFlash = { cls: "", text: "Ticket put back in the queue." }; renderReviewIdle(); needPeek = true; refresh();
+    }
+  });
+
+  // ---------- failures ----------
+  function renderFailures() {
+    const a = q("incoming_dlq"), b = q("classified_dlq");
+    setText("f-in", a.visible + a.in_flight);
+    setText("f-cl", b.visible + b.in_flight);
+    setText("f-max", cfg.max_receive_count);
+    setHTML($("dlq-list"), dlqItems.length ? dlqItems.map((x) => {
+      const at = x.attributes || {};
+      const reason = at.error_reason
+        ? `${nice(at.error_reason)}${at.error_detail ? ` <span class="muted">· ${esc(at.error_detail)}</span>` : ""}`
+        : `Out of retries <span class="muted">· failed ${cfg.max_receive_count} times, moved by SQS</span>`;
+      const mid = x.body && x.body.message_id;
+      const known = mid && rows.some((r) => r.message_id === mid);
+      return `<div class="list-item">
+        <div class="top"><span class="badge b-bad">${x.q} DLQ</span>${at.failed_stage ? `<span class="badge b-gray">stage: ${esc(at.failed_stage)}</span>` : ""}<b>${reason}</b>
+          ${known ? `<a class="right" data-open="${esc(mid)}">View ticket</a>` : ""}</div>
+        <div class="raw" title="${esc(x.raw)}">${esc(x.raw)}</div></div>`;
+    }).join("") : `<div class="empty">${dlqCount() ? "Loading…" : "Nothing has failed."}</div>`);
+  }
+
+  // ---------- pipeline ----------
+  function bump(id, v, node) {
+    const old = prevNums[id];
+    prevNums[id] = v;
+    setText(id, v);
+    if (old !== undefined && v > old && node) { const n = $(node); n.classList.add("pulse"); setTimeout(() => n.classList.remove("pulse"), 600); }
+  }
+  function renderPipeline() {
+    if (!stats) return;
+    const c = stats.counters || {}, st = stats.statuses || {};
+    setText("cfg-thr", cfg.confidence_threshold); setText("cfg-max", cfg.max_receive_count);
+    setText("cfg-backoff", cfg.backoff_base_seconds); setText("cfg-lock", cfg.review_lock_seconds);
+    bump("v-api", c["api.accepted"] || 0, "n-api");
+    for (const k of ["incoming", "classified"]) { bump("v-" + k, q(k).visible, "n-" + k); setText("s-" + k, `${q(k).in_flight} in flight`); }
+    for (const w of ["classifier", "responder"]) { bump("v-" + w, c[w + ".processed"] || 0, "n-" + w); }
+    setText("s-classifier", outageOn ? "model down" : "processed");
+    bump("v-store", st.responded || 0, "n-store");
+    for (const [k, id] of [["incoming_dlq", "incoming-dlq"], ["human_review", "review"], ["classified_dlq", "classified-dlq"]]) {
+      const n = q(k).visible + q(k).in_flight;
+      bump("v-" + id, n, "n-" + id);
+      $("n-" + id).classList.toggle("has", n > 0);
+    }
+    setHTML($("workers"), ["classifier", "responder"].map((w) => `<tr><td><b>${w[0].toUpperCase() + w.slice(1)}</b></td>
+      <td class="c">${c[w + ".processed"] || 0}</td><td class="c">${c[w + ".retried"] || 0}</td><td class="c">${c[w + ".poison"] || 0}</td>
+      <td class="c">${w === "classifier" ? c["classifier.routed_to_human"] || 0 : "-"}</td></tr>`).join(""));
+    const entries = Object.entries(c).sort(([x], [y]) => x.localeCompare(y));
+    setHTML($("counters"), entries.length ? entries.map(([k, v]) => `<dt class="mono">${esc(k)}</dt><dd>${v}</dd>`).join("") : '<dt class="muted">none yet</dt><dd></dd>');
+  }
+
+  // ---------- model ----------
+  async function loadModel() {
+    try {
+      const r = await api("/model");
+      const u = r.unseen_templates, i = r.in_distribution;
+      $("model").innerHTML = `
+        <div class="kpis five">
+          <div class="kpi"><span class="k">Version</span><span class="v sm mono">${esc(r.model_version)}</span></div>
+          <div class="kpi"><span class="k">Training examples</span><span class="v">${r.train_examples}</span></div>
+          <div class="kpi"><span class="k"><span class="sw ok"></span>Accuracy, new wording</span><span class="v">${(u.accuracy * 100).toFixed(1)}%</span><span class="f">the number to trust</span></div>
+          <div class="kpi"><span class="k"><span class="sw info"></span>Accuracy, familiar wording</span><span class="v">${(i.accuracy * 100).toFixed(1)}%</span><span class="f">optimistic</span></div>
+          <div class="kpi"><span class="k"><span class="sw warn"></span>Avg. confidence, new wording</span><span class="v">${u.mean_confidence.toFixed(2)}</span><span class="f">threshold ${cfg.confidence_threshold}</span></div>
+        </div>
+        <div class="card" style="margin-top:20px"><div class="card-h"><h3>How to read this</h3></div><div class="card-b help" style="font-size:13.5px;display:flex;flex-direction:column;gap:8px">
+          <p>The model is trained on synthetic tickets. "New wording" means test tickets phrased in ways the model never saw, which is closest to real customers.</p>
+          <p>When confidence on a ticket is below ${cfg.confidence_threshold}, the ticket is not answered automatically. It goes to <b>Human review</b> instead, and the reviewer's label is kept to retrain the model.</p>
+        </div></div>`;
+    } catch { $("model").innerHTML = '<div class="card"><div class="empty">No training report yet. Run <code>python -m pipeline train</code>.</div></div>'; }
+  }
+
+  // ---------- simulate ----------
+  const demoFlash = (msg, ok = true) => { const f = $("demo-flash"); f.className = "flash " + (ok ? "ok" : "bad"); f.textContent = msg; };
+  $("btn-burst").onclick = async () => {
+    try { const r = await api("/demo/burst", { method: "POST", body: JSON.stringify({ per_intent: 2 }) }); demoFlash(`Sent ${r.submitted} tickets. Watch Tickets and Human review.`); refresh(); }
+    catch (e) { demoFlash(e.message, false); }
+  };
+  $("btn-poison").onclick = async () => {
+    try { await api("/demo/poison", { method: "POST" }); demoFlash("Injected 2 malformed messages. They will appear under Failures."); needPeek = true; refresh(); }
+    catch (e) { demoFlash(e.message, false); }
+  };
+  $("btn-outage").onclick = async () => {
+    try {
+      const r = await api("/demo/outage", { method: "POST", body: JSON.stringify({ on: !outageOn }) });
+      setOutage(r.model_outage);
+      demoFlash(r.model_outage ? "Model is down. Raise tickets and watch them retry, then land in Failures." : "Model is back. New tickets flow normally.");
+    } catch (e) { demoFlash(e.message, false); }
+  };
+  function setOutage(on) {
+    outageOn = on;
+    $("btn-outage").classList.toggle("on", on);
+    $("btn-outage").textContent = on ? "Stop outage" : "Start outage";
+    $("n-classifier").classList.toggle("down", on);
+    $("outage-banner").hidden = !on || !can("demo.control");
+  }
+
+  // ---------- admin: users, roles, audit ----------
+  let adminReady = false;
+  function setupAdmin() {
+    if (adminReady) return; adminReady = true;
+    $("u-role").innerHTML = authCfg.roles.map((r) => `<option value="${esc(r.role)}"${r.role === "viewer" ? " selected" : ""}>${esc(r.label)}</option>`).join("");
+    const perms = Object.keys(PERM_TEXT);
+    $("matrix").innerHTML = `<thead><tr><th>Permission</th>${authCfg.roles.map((r) => `<th class="c">${esc(r.label)}</th>`).join("")}</tr></thead>
+      <tbody>${perms.map((p) => `<tr><td>${esc(PERM_TEXT[p])}</td>${authCfg.roles.map((r) => r.permissions.includes(p) ? '<td class="c yes">✓</td>' : '<td class="c no">-</td>').join("")}</tr>`).join("")}</tbody>`;
+    const uflash = (msg, ok) => { $("u-flash").className = "flash " + (ok ? "ok" : "bad"); $("u-flash").textContent = msg; };
+    $("new-user").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const body = { username: $("u-name").value.trim().toLowerCase(), password: $("u-pass").value, role: $("u-role").value };
+      try { await api("/users", { method: "POST", body: JSON.stringify(body) }); uflash(`Added ${body.username} as ${roleLabel(body.role)}.`, true); $("u-name").value = ""; $("u-pass").value = ""; loadAdmin(true); }
+      catch (err) { uflash(err.message, false); }
+    });
+    const patch = async (username, body, okMsg) => {
+      try {
+        await api(`/users/${encodeURIComponent(username)}`, { method: "PATCH", body: JSON.stringify(body) });
+        uflash(okMsg, true);
+        if (username === me.username && (body.role || body.active === false || body.password)) { location.reload(); return; }
+      } catch (err) { uflash(err.message, false); }
+      loadAdmin(true);
+    };
+    $("users").addEventListener("change", (e) => {
+      const u = e.target.closest("tr[data-u]"); if (!u || e.target.dataset.act !== "role") return;
+      patch(u.dataset.u, { role: e.target.value }, `${u.dataset.u} is now ${roleLabel(e.target.value)}.`);
+    });
+    $("users").addEventListener("click", (e) => {
+      const b = e.target.closest("button[data-act]"); const u = e.target.closest("tr[data-u]"); if (!b || !u) return;
+      const name = u.dataset.u;
+      if (b.dataset.act === "toggle") {
+        const enable = b.dataset.active !== "1";
+        patch(name, { active: enable }, enable ? `${name} enabled.` : `${name} disabled and signed out.`);
+      } else if (b.dataset.act === "reset") {
+        const pw = window.prompt(`New password for ${name} (at least 8 characters). They will be signed out.`);
+        if (pw) patch(name, { password: pw }, `Password for ${name} reset.`);
+      }
+    });
+  }
+  async function loadAdmin(force = false) {
+    if (!can("users.manage")) return;
+    let users, audit;
+    try { [users, audit] = await Promise.all([api("/users"), api("/audit?limit=100")]); } catch { return; }
+    const editing = document.activeElement && $("users").contains(document.activeElement) && document.activeElement.tagName === "SELECT";
+    setText("u-count", `${users.length} user${users.length === 1 ? "" : "s"}`);
+    if (force || !editing) {
+      setHTML($("users"), users.map((u) => `<tr data-u="${esc(u.username)}">
+        <td><div style="display:flex;align-items:center;gap:10px"><span class="avatar" style="width:28px;height:28px;font-size:12px">${esc(u.username[0])}</span><b>${esc(u.username)}</b>${u.username === me.username ? '<span class="muted">(you)</span>' : ""}</div></td>
+        <td><select data-act="role" aria-label="Role for ${esc(u.username)}">${authCfg.roles.map((r) => `<option value="${esc(r.role)}"${r.role === u.role ? " selected" : ""}>${esc(r.label)}</option>`).join("")}</select></td>
+        <td>${u.active ? '<span class="badge dot b-ok">Active</span>' : '<span class="badge dot b-gray">Disabled</span>'}</td>
+        <td class="when">${when(u.created_at)}${u.created_by ? ` · by ${esc(u.created_by)}` : ""}</td>
+        <td class="acts"><button class="sm" data-act="toggle" data-active="${u.active ? 1 : 0}">${u.active ? "Disable" : "Enable"}</button> <button class="sm" data-act="reset">Reset password</button></td>
+      </tr>`).join(""));
+    }
+    const ACTION = { login: "b-gray", login_failed: "b-bad", logout: "b-gray", user_created: "b-accent", user_updated: "b-accent", review_completed: "b-ok", demo_outage: "b-warn" };
+    setHTML($("audit"), audit.length ? audit.map((a) => `<tr>
+      <td class="when">${when(a.at)}</td>
+      <td>${esc(a.actor || "-")}</td>
+      <td><span class="badge ${ACTION[a.action] || "b-gray"}">${nice(a.action)}</span></td>
+      <td>${a.target && a.target !== a.actor ? esc(a.target) : '<span class="muted">-</span>'}</td>
+      <td class="text muted" title="${esc(a.detail || "")}">${esc(a.detail || "")}</td>
+    </tr>`).join("") : '<tr><td colspan="5" class="empty">Nothing yet.</td></tr>');
+  }
+
+  boot();
+})();
+</script>
+</body>
+</html>
